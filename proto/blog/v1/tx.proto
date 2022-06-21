@@ -22,10 +22,9 @@ message MsgCreatePostResponse {}
 
 // MsgCreateComment is the Msg/CreateComment request type.
 message MsgCreateComment {
-  string slug = 1;
+  string post_slug = 1;
   string author = 2;
-  string title = 3;
-  string body = 4;
+  string body = 3;
 }
 
 // MsgCreateCommentResponse is the Msg/CreateComment response type.
