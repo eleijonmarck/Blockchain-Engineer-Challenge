@@ -37,14 +37,14 @@ func (m *MsgCreatePost) GetSigners() []sdk.AccAddress {
 }
 
 func (m *MsgCreateComment) ValidateBasic() error {
+	if m.PostSlug == "" {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "no post slug")
+	}
 	if m.Author == "" {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "no author")
 	}
 	if m.Body == "" {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "no body")
-	}
-	if m.PostSlug == "" {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "no slug")
 	}
 
 	return nil

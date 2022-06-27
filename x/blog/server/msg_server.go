@@ -45,8 +45,8 @@ func (s serverImpl) CreateComment(goCtx context.Context, request *blog.MsgCreate
 	store := prefix.NewStore(ctx.KVStore(s.storeKey), blog.KeyPrefix(blog.CommentKey))
 
 	key := []byte(request.PostSlug)
-	if store.Has(key) {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "duplicate slug %s found", request.PostSlug)
+	if !store.Has(key) {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrInvalidRequest, "post %s to comment on does not exist in state", request.PostSlug)
 	}
 
 	comment := blog.Comment{
