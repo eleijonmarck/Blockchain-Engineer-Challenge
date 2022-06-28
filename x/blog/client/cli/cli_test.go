@@ -182,6 +182,57 @@ func (s *IntegrationTestSuite) TestAllPosts() {
 	}
 }
 
+func (s *IntegrationTestSuite) TestCreateComment() {
+	val0 := s.network.Validators[0]
+
+	testCases := []struct {
+		postArgs    []string
+		commentArgs []string
+		name        string
+		expErr      bool
+		expErrMsg   string
+	}{
+		{
+			postArgs:    []string{val0.Address.String(), "/post", "title", "body"},
+			commentArgs: []string{val0.Address.String(), "/post", "content"},
+			name:        "valid comment request",
+			expErr:      false,
+			expErrMsg:   "",
+		},
+	}
+
+	for _, tc := range testCases {
+		s.Run(tc.name, func() {
+			postcmd := cli.CmdCreatePost()
+			args := append([]string{
+				fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+				fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+				fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+			}, tc.postArgs...)
+			_, err := clitestutil.ExecTestCLICmd(val0.ClientCtx, postcmd, args)
+			s.Require().NoError(err)
+
+			commentcmd := cli.CmdCreateComment()
+			args = append([]string{
+				fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+				fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastBlock),
+				fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin(s.cfg.BondDenom, sdk.NewInt(10))).String()),
+			}, tc.commentArgs...)
+			fmt.Printf("args %v+", args)
+			out, err := clitestutil.ExecTestCLICmd(val0.ClientCtx, commentcmd, args)
+			if tc.expErr {
+				s.Require().Error(err)
+				s.Require().Contains(err.Error(), tc.expErrMsg)
+			} else {
+				var txRes sdk.TxResponse
+				err := val0.ClientCtx.Codec.UnmarshalJSON(out.Bytes(), &txRes)
+				s.Require().NoError(err)
+				s.Require().Equal(uint32(0), txRes.Code)
+			}
+		})
+	}
+}
+
 func TestKeeperTestSuite(t *testing.T) {
 	suite.Run(t, new(IntegrationTestSuite))
 }

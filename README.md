@@ -65,6 +65,12 @@ A new binary will be created under `./build/regen`.
 
 To run the node, you can refer to the documentation [here](https://docs.cosmos.network/master/run-node/).
 
+## Tests
+if you would like to run test, run:
+```bash
+make test
+```
+
 ## Resources
 
 - Cosmos SDK Documentation: https://docs.cosmos.network/master/.
